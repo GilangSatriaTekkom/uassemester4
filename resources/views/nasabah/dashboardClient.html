@@ -1,0 +1,93 @@
+
+@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Dashboard</title>
+     <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
+</head>
+@section('content')
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Dashboard</h1>
+
+        <h2 class="mb-4">Nasabah: {{ $nasabah->name }}</h2>
+
+        <h3>Rekening</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Jumlah Tabungan</th>
+                    <th>Nomor Akun</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($rekenings as $rekening)
+                    <tr>
+                        <td>{{ $rekening->jumlah_tabungan }}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm" onclick="toggleAccountNumber('account-{{ $rekening->id }}')">Lihat Nomor Rekening</button>
+                            <span id="account-{{ $rekening->id }}" class="hidden-account-number">{{ $rekening->nomor_rekening }}</span>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <h3 class="mt-5">Transaksi Hari Ini</h3>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID Nasabah</th>
+                    <th>Tipe Transaksi</th>
+                    <th>Jumlah Transaksi</th>
+                    <th>Tanggal Transaksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($transaksis as $transaksi)
+                    <tr>
+                        <td>{{ $transaksi->id_nasabah }}</td>
+                        <td>{{ $transaksi->tipe_transaksi }}</td>
+                        <td>{{ $transaksi->jumlah_transaksi }}</td>
+                        <td>{{ $transaksi->tanggal_transaksi }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        .hidden-account-number {
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleAccountNumber(id) {
+            var element = document.getElementById(id);
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+@endsection
+</html>

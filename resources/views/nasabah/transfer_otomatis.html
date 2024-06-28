@@ -1,0 +1,139 @@
+@extends('layouts.app')
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Dashboard</title>
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <style>
+        .hidden-account-number {
+            display: none;
+        }
+    </style>
+    <script>
+        function toggleAccountNumber(id) {
+            var element = document.getElementById(id);
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+            } else {
+                element.style.display = 'none';
+            }
+        }
+
+        function toggleDateAndTime() {
+            var interval = document.getElementById('interval').value;
+            var dateField = document.getElementById('dateField');
+            var timeField = document.getElementById('timeField');
+
+            if (interval === 'rubah') {
+                dateField.style.display = 'block';
+                timeField.style.display = 'block';
+            } else {
+                dateField.style.display = 'none';
+                timeField.style.display = 'none';
+            }
+        }
+
+        function confirmSubmission(event) {
+            event.preventDefault();
+            if (confirm('Apakah anda yakin?')) {
+                alert('Pembuatan selesai');
+                event.target.submit();
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            toggleDateAndTime();
+        });
+    </script>
+</head>
+@section('content')
+<div class="container">
+    @if (session('success'))
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+            @endforeach
+        </div>
+    @endif
+
+    <form action="{{ route('transactions.auto.store', ['id' => $id]) }}" method="POST" onsubmit="confirmSubmission(event)">
+        @csrf
+        <div class="form-group">
+            <label>Nomor Rekening Penerima</label>
+            <input type="text" class="form-control" name="nomor_rekening" value="{{ old('nomor_rekening') }}" required>
+        </div>
+        <div class="form-group">
+            <label>Jumlah Transfer</label>
+            <input type="number" class="form-control" name="jumlah_transfer" value="{{ old('jumlah_transfer') }}" required>
+        </div>
+        <div class="form-group">
+            <label>Interval</label>
+            <select class="form-control" name="interval" id="interval" required onchange="toggleDateAndTime()">
+                <option value="rubah" {{ old('interval') == 'rubah' ? 'selected' : '' }}>Rubah sesuai tanggal</option>
+                <option value="mingguan" {{ old('interval') == 'mingguan' ? 'selected' : '' }}>1 minggu sekali</option>
+                <option value="bulanan" {{ old('interval') == 'bulanan' ? 'selected' : '' }}>1 bulan sekali</option>
+            </select>
+        </div>
+        <div class="form-group" id="dateField" style="display:none;">
+            <label>Tanggal</label>
+            <input type="date" class="form-control" name="tanggal" value="{{ old('tanggal') }}">
+        </div>
+        <div class="form-group" id="timeField" style="display:none;">
+            <label>Waktu</label>
+            <input type="time" class="form-control" name="waktu" value="{{ old('waktu') }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <!-- Table of Auto Transactions -->
+    <table class="table mt-5">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nomor Rekening Pengirim</th>
+                <th>Nomor Rekening Penerima</th>
+                <th>Jumlah Transfer</th>
+                <th>Interval</th>
+                <th>Tanggal</th>
+                <th>Waktu</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($autoTransactions as $transaction)
+                <tr>
+                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $transaction->nomor_rekening_pengirim }}</td>
+                    <td>{{ $transaction->nomor_rekening }}</td>
+                    <td>{{ $transaction->jumlah_transfer }}</td>
+                    <td>{{ $transaction->interval }}</td>
+                    <td>{{ $transaction->tanggal }}</td>
+                    <td>{{ $transaction->waktu }}</td>
+                    <td>
+                        <form action="{{ route('transactions.auto.destroy', $transaction->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus transfer otomatis ini?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endsection

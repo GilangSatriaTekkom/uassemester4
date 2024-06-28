@@ -1,0 +1,228 @@
+@extends('layouts.app')
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Koin Counter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .form-check-label {
+            margin-left: 10px;
+        }
+        .btn-primary {
+            width: 100%;
+        }
+    </style>
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Toastr CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet">
+
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+</head>
+@section('content')
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Koin Counter</h1>
+
+        <h2 class="mb-4">Nama Pegawai: {{ Auth::user()->name }}</h2>
+
+        <div class="form-check">
+            <input type="checkbox" id="limitCheckbox" class="form-check-input" onclick="toggleLimitInput()">
+            <label for="limitCheckbox" class="form-check-label">Enable Limit</label>
+        </div>
+
+        <div class="form-group hidden" id="limitInputContainer">
+            <label for="limitInput">Limit</label>
+            <input type="number" id="limitInput" class="form-control">
+        </div>
+
+        <button class="btn btn-primary mt-3" onclick="controlRelay('start')">Start Machine</button>
+        <button class="btn btn-danger mt-3" onclick="controlRelay('stop')">Stop Machine</button>
+
+        <h3 class="mt-5">Coin Counts</h3>
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Coin 100: <span id="coin100" class="badge badge-primary badge-pill">0</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Coin 200: <span id="coin200" class="badge badge-primary badge-pill">0</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Coin 500: <span id="coin500" class="badge badge-primary badge-pill">0</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Coin 1000: <span id="coin1000" class="badge badge-primary badge-pill">0</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    Total Amount: <span id="totalAmount" class="badge badge-primary badge-pill">0</span>
+                </li>
+            </ul>
+
+            <form method="POST" action="{{ route('resetCounter') }}" class="mt-3">
+                @csrf
+                <button type="submit" class="btn btn-danger">Reset Counter</button>
+            </form>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script>
+
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch initial coin counts
+            updateCoinCounts();
+            setInterval(fetchCoinCounts, 1000); // Fetch data every 10 seconds
+        });
+
+        function updateCoinCounts() {
+            fetch('/coin-counts')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('coin100').innerText = data.coin100;
+                    document.getElementById('coin200').innerText = data.coin200;
+                    document.getElementById('coin500').innerText = data.coin500;
+                    document.getElementById('coin1000').innerText = data.coin1000;
+                    document.getElementById('totalAmount').innerText = data.totalAmount;
+                })
+                .catch(error => console.error('Error fetching coin counts:', error));
+        }
+
+        setInterval(updateCoinCounts, 1000);  // Update coin counts every 5 seconds
+
+        function controlRelay(action) {
+            fetch(`/control-relay/${action}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data); // Log success message or handle response
+                // Example: Update UI based on the response
+                if (data.message === 'Machine started') {
+                    // Handle UI update when machine starts
+                } else if (data.message === 'Machine stopped') {
+                    // Handle UI update when machine stops
+                }
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+        }
+
+        // Example of how to call controlRelay function
+        document.getElementById('startMachineBtn').addEventListener('click', function() {
+            controlRelay('start');
+        });
+
+        document.getElementById('stopMachineBtn').addEventListener('click', function() {
+            controlRelay('stop');
+        });
+        
+        document.getElementById('resetCounterForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent form from submitting normally
+
+            if (confirm('Apakah Anda yakin untuk mereset counter?')) {
+                console.log('User confirmed reset');
+                fetch(this.action, {
+                    method: this.method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                })
+                .then(response => {
+                    console.log('Fetch completed', response);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Response data', data);
+                    if (data.message) {
+                        toastr.success(data.message); // Show success message
+                        updateCoinCounts(); // Update coin counts if necessary
+                        // Redirect back to previous page
+                        window.history.back();
+                    } else {
+                        toastr.error('Gagal mereset counter.'); // Show error message
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    toastr.error('Terjadi kesalahan saat mereset counter.'); // Show error message
+                });
+            } else {
+                console.log('User canceled reset');
+            }
+        });
+
+    
+
+        function toggleLimitInput() {
+            const limitCheckbox = document.getElementById('limitCheckbox');
+            const limitInputContainer = document.getElementById('limitInputContainer');
+            if (limitCheckbox.checked) {
+                limitInputContainer.classList.remove('hidden');
+            } else {    
+                limitInputContainer.classList.add('hidden');
+            }
+        }
+
+        function startMachine() {
+            const employeeName = "{{ Auth::user()->name }}";
+            const limitInput = document.getElementById('limitInput').value;
+            const limitCheckbox = document.getElementById('limitCheckbox').checked;
+
+            // Send data to ESP8266
+            fetch('/start-machine', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    employeeName,
+                    limitInput,
+                    limitCheckbox
+                })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      alert('Alat dijalankan');
+                      updateCoinCounts();
+                  } else {
+                      alert('Gagal menjalankan alat');
+                  }
+              });
+        }
+
+        
+    </script>
+</body>
+@endsection
+</html>

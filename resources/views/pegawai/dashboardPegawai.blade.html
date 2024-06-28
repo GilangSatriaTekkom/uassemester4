@@ -1,0 +1,146 @@
+@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <!-- Styles -->
+    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+@section('content')
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Dashboard</h1>
+        
+        <!-- Table -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Jam</th>
+                    <th>Nama Pegawai</th>
+                    <th>Nama Nasabah</th>
+                    <th>Jumlah Koin 100</th>
+                    <th>Jumlah Koin 200</th>
+                    <th>Jumlah Koin 500</th>
+                    <th>Jumlah Koin 1000</th>
+                    <th>Jumlah Rupiah</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($laporan as $data)
+                <tr>
+                    <td>{{ $data->tanggal }}</td>
+                    <td>{{ $data->jam }}</td>
+                    <td>{{ $data->nama_pegawai }}</td>
+                    <td>{{ $data->nama_nasabah }}</td>
+                    <td>{{ $data->jumlah_koin_100 }}</td>
+                    <td>{{ $data->jumlah_koin_200 }}</td>
+                    <td>{{ $data->jumlah_koin_500 }}</td>
+                    <td>{{ $data->jumlah_koin_1000 }}</td>
+                    <td>{{ $data->jumlah_rupiah }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <!-- Chart Container for Koin -->
+        <div class="mt-5">
+            <h2>Chart of Jumlah Koin</h2>
+            <canvas id="coinChart"></canvas>
+        </div>
+
+        <!-- Chart Container for Rupiah -->
+        <div class="mt-5">
+            <h2>Chart of Jumlah Rupiah</h2>
+            <canvas id="rupiahChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Chart.js Script -->
+    <script>
+        // Chart for Koin
+        var ctxKoin = document.getElementById('coinChart').getContext('2d');
+        var coinChart = new Chart(ctxKoin, {
+            type: 'bar',
+            data: {
+                labels: @json($laporan->pluck('tanggal')),
+                datasets: [{
+                    label: 'Jumlah Koin 100',
+                    data: @json($laporan->pluck('jumlah_koin_100')),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Jumlah Koin 200',
+                    data: @json($laporan->pluck('jumlah_koin_200')),
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Jumlah Koin 500',
+                    data: @json($laporan->pluck('jumlah_koin_500')),
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Jumlah Koin 1000',
+                    data: @json($laporan->pluck('jumlah_koin_1000')),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Chart for Rupiah
+        var ctxRupiah = document.getElementById('rupiahChart').getContext('2d');
+        var rupiahChart = new Chart(ctxRupiah, {
+            type: 'line',
+            data: {
+                labels: @json($laporan->pluck('tanggal')),
+                datasets: [{
+                    label: 'Jumlah Rupiah',
+                    data: @json($laporan->pluck('jumlah_rupiah')),
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1,
+                    fill: true
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+@endsection
+
+</html>
+
