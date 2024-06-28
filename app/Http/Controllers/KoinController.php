@@ -134,46 +134,56 @@ class KoinController extends Controller
     // In your controller (e.g., ReportController)
     
 
-    public function update(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nama_nasabah' => 'required|string',
-            'nama_pegawai' => 'required|string',
-        ]);
-    
-        // Ambil data jumlah koin dari tabel counter
-        $jumlah_koin_100 = Counter::where('nilai_koin', 100)->sum('jumlah');
-        $jumlah_koin_200 = Counter::where('nilai_koin', 200)->sum('jumlah');
-        $jumlah_koin_500 = Counter::where('nilai_koin', 500)->sum('jumlah');
-    
-        // Hitung jumlah rupiah
-        $jumlah_rupiah = (100 * $jumlah_koin_100) + (200 * $jumlah_koin_200) + (500 * $jumlah_koin_500);
-    
-        // Debug menggunakan Log
-        Log::info('Debug data:', [
-            'jumlah_koin_100' => $jumlah_koin_100,
-            'jumlah_koin_200' => $jumlah_koin_200,
-            'jumlah_koin_500' => $jumlah_koin_500,
-            'jumlah_rupiah' => $jumlah_rupiah,
-            'nama_nasabah' => $request->input('nama_nasabah'),
-            'nama_pegawai' => $request->input('nama_pegawai'),
-        ]);
-    
-        // Buat entri baru di tabel laporan
-        $laporan = new TabelLaporan();
-        $laporan->tanggal = Carbon::today()->toDateString();
-        $laporan->jam = Carbon::now()->toTimeString();
-        $laporan->jumlah_koin_100 = $jumlah_koin_100;
-        $laporan->jumlah_koin_200 = $jumlah_koin_200;
-        $laporan->jumlah_koin_500 = $jumlah_koin_500;
-        $laporan->jumlah_rupiah = $jumlah_rupiah;
-        $laporan->nama_nasabah = $request->input('nama_nasabah');
-        $laporan->nama_pegawai = $request->input('nama_pegawai');
-    
-        // Simpan entri baru ke dalam database
-        $laporan->save();
-    
-        return redirect()->back()->with('success', 'Laporan baru berhasil dibuat.');
+    public function update(Request $request, $id)
+{
+    $validatedData = $request->validate([
+        'nama_nasabah' => 'required|string',
+        
+    ]);
+
+    // Cari ID nasabah berdasarkan nama
+    $nasabah = User::where('name', $request->input('nama_nasabah'))->first();
+
+    $namaNasabahExists = User::where('name', $request->input('nama_nasabah'))->exists();
+    if (!$namaNasabahExists) {
+        return redirect()->back()->with('error', 'Nama nasabah tidak ditemukan.');
     }
+
+    // Ambil data jumlah koin dari tabel counter
+    $jumlah_koin_100 = counterModel::where('jenis_koin', 'koin100')->sum('jenis_koin');
+    $jumlah_koin_200 = counterModel::where('jenis_koin', 'koin200')->sum('jenis_koin');
+    $jumlah_koin_500 = counterModel::where('jenis_koin', 'koin500')->sum('jenis_koin');
+
+    // Hitung jumlah rupiah
+    $jumlah_rupiah = (100 * $jumlah_koin_100) + (200 * $jumlah_koin_200) + (500 * $jumlah_koin_500);
+
+    // Debug menggunakan Log
+    Log::info('Debug data:', [
+        'jumlah_koin_100' => $jumlah_koin_100,
+        'jumlah_koin_200' => $jumlah_koin_200,
+        'jumlah_koin_500' => $jumlah_koin_500,
+        'jumlah_rupiah' => $jumlah_rupiah,
+        'nama_nasabah' => $request->input('nama_nasabah'),
+        'nama_pegawai' => auth()->user()->name, // Mengambil nama pegawai dari user yang sedang login
+    ]);
+
+    // Buat entri baru di tabel laporan
+    $laporan = new TabelLaporan();
+    $laporan->tanggal = Carbon::today()->toDateString();
+    $laporan->jam = Carbon::now()->toTimeString();
+    $laporan->jumlah_koin_100 = $jumlah_koin_100;
+    $laporan->jumlah_koin_200 = $jumlah_koin_200;
+    $laporan->jumlah_koin_500 = $jumlah_koin_500;
+    $laporan->jumlah_koin_1000 = 0;
+    $laporan->jumlah_rupiah = $jumlah_rupiah;
+    $laporan->nama_nasabah = $nasabah->id; // Simpan ID nasabah, bukan nama
+    $laporan->nama_pegawai = auth()->user()->id; // Mengambil nama pegawai dari user yang sedang login
+
+    // Simpan entri baru ke dalam database
+    $laporan->save();
+
+    return redirect()->back()->with('success', 'Laporan baru berhasil dibuat.');
+}
+
 
 }

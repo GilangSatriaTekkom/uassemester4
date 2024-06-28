@@ -6,14 +6,14 @@
     <div class="sidenav-header">
         <i class="fas fa-times p-3 cursor-pointer text-secondary opacity-5 position-absolute end-0 top-0 d-none d-xl-none"
             aria-hidden="true" id="iconSidenav"></i>
-        <a class="navbar-brand m-0" href=" https://demos.creative-tim.com/argon-dashboard/pages/dashboard.html "
+        <a class="navbar-brand m-0" href=" / "
             target="_blank">
             <img src="{{ asset('/assets/img/logo-ct-dark.png') }}" class="navbar-brand-img h-100" alt="main_logo">
-            <span class="ms-1 font-weight-bold">Argon Dashboard 2</span>
+            <span class="ms-1 font-weight-bold" style="font-size: large">Counter</span>
         </a>
     </div>
     <hr class="horizontal dark mt-0">
-    <div class="collapse navbar-collapse  w-auto " id="sidenav-collapse-main">
+    <div class="w-auto " id="sidenav-collapse-main">
         <ul class="navbar-nav">
             @auth
             @if(auth()->user()->level === 'admin')
@@ -88,7 +88,7 @@
 
             
 
-            <li class="nav-item">
+            <!-- <li class="nav-item">
                 <a class="nav-link {{ request()->is('pegawai/notifications/*') ? 'active' : '' }}"
                     href="{{ route('pegawai.notifications.index', ['id' => auth()->user()->id]) }}">
                     <div
@@ -98,7 +98,7 @@
                     <span class="nav-link-text ms-1">Notification</span>
                     <span class="badge badge-light">{{ Auth::user()->unreadNotifications->count() }}</span>
                 </a>
-            </li>
+            </li> -->
 
             <li class="nav-item mt-3">
                 <h6 class="ps-4 ms-2 text-uppercase text-xs font-weight-bolder opacity-6">Account pages</h6>

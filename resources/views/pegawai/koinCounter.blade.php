@@ -64,23 +64,16 @@
                     <div class="card mb-4" style="padding: 40px;">
                         <div class="card-header pb-0">
                             <h6>
-                                Koin Counter
+                                Penghitung Koin
                             </h6>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2">
                             <div class="align-items-center mb-0">
-                                <h2 class="mb-4">Nama Pegawai: {{ Auth::user()->name }}</h2>
 
-                                <div class="form-group">
-                                                <label for="nama_nasabah">Nama Nasabah</label>
-                                                <select class="form-control" id="nama_nasabah" name="nama_nasabah">
-                                                    @foreach($users as $nasabah)
-                                                    <option value="{{ $nasabah->id }}">{{ $nasabah->name }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
+                                
+   
 
-                                <div class="form-check">
+                                <!-- <div class="form-check">
                                     <input type="checkbox" id="limitCheckbox" class="form-check-input"
                                         onclick="toggleLimitInput()">
                                     <label for="limitCheckbox" class="form-check-label">Enable Limit</label>
@@ -89,7 +82,7 @@
                                 <div class="form-group hidden" id="limitInputContainer">
                                     <label for="limitInput">Limit</label>
                                     <input type="number" id="limitInput" class="form-control">
-                                </div>
+                                </div> -->
 
                                 <div id="statusIndicator" class="mt-3">
                                     <!-- Status will be dynamically inserted here -->
@@ -109,7 +102,7 @@
                                     </form>
                                 </div>
 
-                                <h3 class="mt-5">Coin Counts</h3>
+                                <h3 class="mt-5 p-3">Update Laporan</h3>
                                 <ul class="list-group">
                                     <li class="list-group-item d-flex justify-content-between align-items-center">
                                         Coin 100: <span id="coin100" class="">0</span>
@@ -128,20 +121,29 @@
                                     </li>
                                 </ul>
 
-                                <form method="POST" action="{{ route('resetCounter') }}" class="mt-3">
-                                    @csrf
-                                    <button type="submit" class="btn btn-danger">Reset Counter</button>
-                                </form>
+                                
 
                                 <form method="POST" action="{{ route('updateReport', ['id' => $user->id]) }}" class="mt-3">
-                                <input type="hidden" id="hidden_nama_nasabah" name="nama_nasabah">
+    @csrf
 
-    <!-- Input hidden for nama pegawai -->  
+    <!-- Input hidden untuk nama pegawai -->
     <input type="hidden" id="nama_pegawai" name="nama_pegawai" value="{{ Auth::user()->name }}">
 
+    <!-- Input untuk nama nasabah -->
+    <div class="form-group">
+        <label for="nama_nasabah">Nama Nasabah</label>
+        <input type="text" class="form-control" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required>
+    </div>
 
-                                    <button type="submit" class="btn btn-success">Update</button>
-                                </form>
+    <!-- Flex container for buttons -->
+    <div class="d-flex justify-content-between mt-3">
+        <button type="submit" class="btn btn-success">Update</button>
+        <form method="POST" action="{{ route('resetCounter') }}">
+            @csrf
+            <button type="submit" class="btn btn-danger">Reset Counter</button>
+        </form>
+    </div>
+</form>
 
                             </div>
                         </div>
@@ -516,12 +518,8 @@
 
     </script>
 
-<script>
-    document.getElementById('updateForm').addEventListener('submit', function(e) {
-        var selectedNasabah = document.getElementById('nama_nasabah').value;
-        document.getElementById('hidden_nama_nasabah').value = selectedNasabah;
-    });
-</script>
+
+
 
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

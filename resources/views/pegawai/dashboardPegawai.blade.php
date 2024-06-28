@@ -259,89 +259,78 @@
     <script src="{{ asset('/assets/js/plugins/smooth-scrollbar.min.js') }}"></script>
     <script src="{{ asset('/assets/js/plugins/chartjs.min.js') }}"></script>
     <script>
-        var ctx1 = document.getElementById("chart-line").getContext("2d");
-
-        var gradientStroke1 = ctx1.createLinearGradient(0, 230, 0, 50);
-
-        gradientStroke1.addColorStop(1, 'rgba(94, 114, 228, 0.2)');
-        gradientStroke1.addColorStop(0.2, 'rgba(94, 114, 228, 0.0)');
-        gradientStroke1.addColorStop(0, 'rgba(94, 114, 228, 0)');
-        new Chart(ctx1, {
-            type: "line",
-            data: {
-                labels: ["Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Mobile apps",
-                    tension: 0.4,
-                    borderWidth: 0,
-                    pointRadius: 0,
-                    borderColor: "#5e72e4",
-                    backgroundColor: gradientStroke1,
-                    borderWidth: 3,
-                    fill: true,
-                    data: [50, 40, 300, 220, 500, 250, 400, 230, 500],
-                    maxBarThickness: 6
-
-                }],
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false,
-                    }
+    // Chart for Koin
+    var ctxKoin = document.getElementById('coinChart').getContext('2d');
+    var coinChart = new Chart(ctxKoin, {
+        type: 'bar',
+        data: {
+            labels: @json($laporan->pluck('tanggal')),
+            datasets: [
+                {
+                    label: 'Jumlah Koin 100',
+                    data: @json($laporan->pluck('jumlah_koin_100')),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
                 },
-                interaction: {
-                    intersect: false,
-                    mode: 'index',
+                {
+                    label: 'Jumlah Koin 200',
+                    data: @json($laporan->pluck('jumlah_koin_200')),
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
                 },
-                scales: {
-                    y: {
-                        grid: {
-                            drawBorder: false,
-                            display: true,
-                            drawOnChartArea: true,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            padding: 10,
-                            color: '#fbfbfb',
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
-                    x: {
-                        grid: {
-                            drawBorder: false,
-                            display: false,
-                            drawOnChartArea: false,
-                            drawTicks: false,
-                            borderDash: [5, 5]
-                        },
-                        ticks: {
-                            display: true,
-                            color: '#ccc',
-                            padding: 20,
-                            font: {
-                                size: 11,
-                                family: "Open Sans",
-                                style: 'normal',
-                                lineHeight: 2
-                            },
-                        }
-                    },
+                {
+                    label: 'Jumlah Koin 500',
+                    data: @json($laporan->pluck('jumlah_koin_500')),
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    borderWidth: 1
                 },
-            },
-        });
+                {
+                    label: 'Jumlah Koin 1000',
+                    data: @json($laporan->pluck('jumlah_koin_1000')),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
 
-    </script>
+    // Chart for Rupiah
+    var ctxRupiah = document.getElementById('rupiahChart').getContext('2d');
+    var rupiahChart = new Chart(ctxRupiah, {
+        type: 'line',
+        data: {
+            labels: @json($laporan->pluck('tanggal')),
+            datasets: [
+                {
+                    label: 'Jumlah Rupiah',
+                    data: @json($laporan->pluck('jumlah_rupiah')),
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
         if (win && document.querySelector('#sidenav-scrollbar')) {

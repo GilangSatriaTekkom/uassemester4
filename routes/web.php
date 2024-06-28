@@ -76,6 +76,10 @@ Route::resource('auto-transaksi', TabelAutoTransaksiController::class);
         Route::get('/pegawai/notifications/{id}', [NotificationController::class, 'index'])->name('pegawai.notifications.index');
         Route::post('/pegawai/koin-counter/controlRelay/', [ToggleController::class, 'controlRelay'])->name('controlRelay');
         Route::get('/getStatus', [ToggleController::class, 'getStatus']);
+        Route::get('/api/koin-counter/suggest', [KoinController::class, 'suggestNasabah'])->name('api.koin-counter.suggest');
+        Route::post('/koinCounter/update/{id}', [KoinController::class, 'update'])->name('koinCounter.update');
+
+
         
         
 
