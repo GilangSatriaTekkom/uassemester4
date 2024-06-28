@@ -122,16 +122,23 @@ class KoinController extends Controller
     }
 
     public function resetCounter(Request $request)
-    {
+{
+    try {
         // Hapus semua data dari tabel counter
-        try {
-            DB::table('counter')->truncate(); // Menghapus semua baris dalam tabel
-            return response()->json(['message' => 'Counter berhasil direset.']);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal mereset counter.'], 500);
-        }
+        DB::table('counter')->truncate(); // Menghapus semua baris dalam tabel
+
+         // Mendapatkan ID pengguna dari request
+         $userId = $request->user()->id; // Contoh mendapatkan ID pengguna saat ini
+
+
+        // Redirect ke halaman koincounter dengan pesan sukses
+        return redirect()->route('koin.counter', ['id' => $userId])->with('message', 'Counter berhasil direset.');
+    } catch (\Exception $e) {
+        // Redirect ke halaman koincounter dengan pesan error
+        return redirect()->route('koin.counter', ['id' => $userId])->with('message', 'Gagal reset counter.');
     }
-    // In your controller (e.g., ReportController)
+}
+
     
 
     public function update(Request $request, $id)
