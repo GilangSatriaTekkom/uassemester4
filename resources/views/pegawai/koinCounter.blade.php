@@ -136,14 +136,16 @@
     </div>
 
     <!-- Flex container for buttons -->
-    <div class="d-flex justify-content-between mt-3">
+    
+</form>
+
+<div class="d-flex justify-content-between mt-3">
         <button type="submit" class="btn btn-success">Update</button>
         <form method="POST" action="{{ route('resetCounter') }}">
             @csrf
             <button type="submit" class="btn btn-danger">Reset Counter</button>
         </form>
     </div>
-</form>
 
                             </div>
                         </div>

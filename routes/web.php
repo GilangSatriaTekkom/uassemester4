@@ -25,6 +25,7 @@ use App\Http\Controllers\TransaksiOtomatisController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ToggleController;
+use App\Http\Controllers\SensorController;
 
 
 Route::get('/', function () {
@@ -39,6 +40,10 @@ Route::resource('transaksi', TabelTransaksiController::class);
 Route::resource('notifikasi', TabelNotifikasiController::class);
 Route::resource('auto-transaksi', TabelAutoTransaksiController::class);
 
+Route::get('/sensor-koin/{cointype}',[SensorController::class,'counter']);
+Route::get('/sensor-pintu/{status}',[SensorController::class,'log']);
+Route::get('/suhu',[SensorController::class,'getSuhu']);
+Route::get('/log',[SensorController::class,'getLog']);
     
     // Routes for Admin
     Route::middleware([AuthenticateAdmin::class])->group(function () {
