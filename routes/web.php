@@ -26,6 +26,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\ToggleController;
 use App\Http\Controllers\SensorController;
+use Illuminate\Support\Facades\DB;
 
 
 Route::get('/', function () {
@@ -44,12 +45,12 @@ Route::get('/sensor-koin/{cointype}',[SensorController::class,'counter']);
 Route::get('/sensor-pintu/{status}',[SensorController::class,'log']);
 Route::get('/suhu',[SensorController::class,'getSuhu']);
 Route::get('/log',[SensorController::class,'getLog']);
-    
+
     // Routes for Admin
     Route::middleware([AuthenticateAdmin::class])->group(function () {
         Route::get('/admin/dashboard/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-        
-        Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');  
+
+        Route::get('/admin/profile', [AdminController::class, 'profile'])->name('admin.profile');
         Route::get('/admin/profile/{id}', [ProfileController::class, 'show'])->name('admin.profile.show');
         Route::post('/admin/profile/update/{id}', [ProfileController::class, 'update'])->name('admin.profile.update');
 
@@ -58,12 +59,11 @@ Route::get('/log',[SensorController::class,'getLog']);
         Route::post('/admin/laporan/{id}', [LaporanController::class, 'store'])->name('admin.laporan.store');
         Route::get('/admin/laporan/{id}/edit/{id_laporan}', [LaporanController::class, 'edit'])->name('admin.laporan.edit');
         Route::put('/admin/laporan/{id}/update/{id_laporan}', [LaporanController::class, 'update'])->name('admin.laporan.update');
-        Route::delete('/admin/laporan/{id}', [LaporanController::class, 'destroy'])->name('admin.laporan.destroy');
-        Route::get('/admin/laporan', [LaporanController::class, 'index'])->name('admin.laporan.index'); // Ubah route ini
+        Route::delete('/admin/laporan/{id}/{id_laporan}', [LaporanController::class, 'destroy'])->name('admin.laporan.destroy');
         Route::get('/admin/laporan/filter', [LaporanController::class, 'filter'])->name('admin.laporan.filter'); // Sesuaikan route ini dengan yang digunakan di form filter
         Route::get('/admin/laporan/search', 'App\Http\Controllers\LaporanController@search')->name('admin.laporan.search');
-        
-        
+
+
     });
 
     // Routes for Pegawai
@@ -83,10 +83,33 @@ Route::get('/log',[SensorController::class,'getLog']);
         Route::get('/getStatus', [ToggleController::class, 'getStatus']);
         Route::get('/api/koin-counter/suggest', [KoinController::class, 'suggestNasabah'])->name('api.koin-counter.suggest');
         Route::post('/koinCounter/update/{id}', [KoinController::class, 'update'])->name('koinCounter.update');
+        Route::get('/total-amount', function () {
+            $coins = DB::table('counter')
+                ->select('jenis_koin', DB::raw('count(*) as total'))
+                ->groupBy('jenis_koin')
+                ->get();
+
+            $totalAmount = 0;
+            foreach ($coins as $coin) {
+                switch ($coin->jenis_koin) {
+                    case 'koin100':
+                        $totalAmount += $coin->total * 100;
+                        break;
+                    case 'koin200':
+                        $totalAmount += $coin->total * 200;
+                        break;
+                    case 'koin500':
+                        $totalAmount += $coin->total * 500;
+                        break;
+                }
+            }
+
+            return response()->json(['totalAmount' => $totalAmount]);
+        });
 
 
-        
-        
+
+
 
 
     });
@@ -95,11 +118,12 @@ Route::get('/log',[SensorController::class,'getLog']);
     Route::middleware([AuthenticateNasabah::class])->group(function () {
         Route::get('/nasabah/dashboard/{id}', [NasabahController::class, 'dashboard'])->name('nasabah.dashboard');
         Route::get('/transactions/create/{type}/{id}', [TransaksiController::class, 'create'])->name('transactions.create');
-        Route::post('/transactions/store/{type}/{id}', [TransaksiController::class, 'store'])->name('transactions.store'); 
-        Route::get('/transactions/history/{id}', [TransaksiController::class, 'history'])->name('transactions.history');  
-        Route::get('/nasabah/notifications/{id}', [NotificationController::class, 'index'])->name('notifications.index');
-        
-        
+        Route::post('/transactions/store/{type}/{id}', [TransaksiController::class, 'store'])->name('transactions.store');
+        Route::get('/transactions/history/{id}', [TransaksiController::class, 'history'])->name('transactions.history');
+        Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::get('/notifications/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+
+
         Route::get('/nasabah/profile/{id}', [ProfileController::class, 'show'])->name('profile.show');
         Route::post('/nasabah/profile/update/{id}', [ProfileController::class, 'update'])->name('profile.update');
         Route::get('/transactions/auto/{id}', [TransaksiOtomatisController::class, 'index'])->name('transactions.auto');
@@ -110,7 +134,7 @@ Route::get('/log',[SensorController::class,'getLog']);
 
         Route::get('/nomor-rekening/{nomor_rekening}', function($nomor_rekening) {
             $rekening = TabelRekening::where('nomor_rekening', $nomor_rekening)->first();
-        
+
             if ($rekening) {
                 return response()->json([
                     'success' => true,

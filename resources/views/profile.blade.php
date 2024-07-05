@@ -44,13 +44,13 @@
     </div>
     @include('layouts.navbar')
     @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
     <div class="main-content position-relative max-height-vh-100 h-100">
 
@@ -74,25 +74,26 @@
                                 {{ ucfirst(Auth::user()->level) }}
                             </p>
                             <div class="numbers text-end">
-                            @if (Auth::user()->level == 'nasabah')
-                                <p class="text-sm mb-0 text-uppercase font-weight-bold">Saldo</p>
-                                <h5 class="font-weight-bolder">
-                                    {{ 'Rp.' . number_format($saldo, 0, ',', '.') . ',00' }}
-                                </h5>
-                                <div class="mt-3">
-                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">
-                                        <span id="toggleRekening" style="cursor: pointer;">Tampilkan Nomor Rekening</span>
-                                    </p>
-                                    <h5 id="nomorRekening" class="font-weight-bolder d-none">
-                                        {{ $nomorRekening }}
+                                @if (Auth::user()->level == 'nasabah')
+                                    <p class="text-sm mb-0 text-uppercase font-weight-bold">Saldo</p>
+                                    <h5 class="font-weight-bolder">
+                                        {{ 'Rp.' . number_format($saldo, 0, ',', '.') . ',00' }}
                                     </h5>
-                                </div>
-                            @endif
-                    </div>
+                                    <div class="mt-3">
+                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">
+                                            <span id="toggleRekening" style="cursor: pointer;">Tampilkan Nomor
+                                                Rekening</span>
+                                        </p>
+                                        <h5 id="nomorRekening" class="font-weight-bolder d-none">
+                                            {{ $nomorRekening }}
+                                        </h5>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
 
                     </div>
-                    
+
 
                 </div>
             </div>
@@ -104,7 +105,7 @@
                         <div class="card-body">
                             <p class="text-uppercase text-sm">User Information</p>
                             <form
-                                action="@if(Auth::user()->level == 'admin') {{ route('admin.profile.update', $user->id) }} @elseif(Auth::user()->level == 'pegawai') {{ route('pegawai.profile.update', $user->id) }} @else {{ route('profile.update', $user->id) }} @endif"
+                                action="@if (Auth::user()->level == 'admin') {{ route('admin.profile.update', $user->id) }} @elseif(Auth::user()->level == 'pegawai') {{ route('pegawai.profile.update', $user->id) }} @else {{ route('profile.update', $user->id) }} @endif"
                                 method="POST">
                                 @csrf
                                 <div class="row">
@@ -112,31 +113,31 @@
                                         <div class="form-group">
                                             <label for="name" class="form-control-label">Nama</label>
                                             <input class="form-control" type="text" id="name" name="name"
-                                                value="{{ $user->name }}" required @if($user->roles == 'pegawai')
-                                            readonly @endif>
+                                                value="{{ $user->name }}" required
+                                                @if ($user->roles == 'pegawai') readonly @endif>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="no_hp" class="form-control-label">No Hp</label>
                                             <input class="form-control" type="text" id="no_hp" name="no_hp"
-                                                value="{{ $user->no_hp }}" required @if($user->roles == 'pegawai')
-                                            readonly @endif>
+                                                value="{{ $user->no_hp }}" required
+                                                @if ($user->roles == 'pegawai') readonly @endif>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="email" class="form-control-label">Email</label>
                                             <input class="form-control" type="email" id="email" name="email"
-                                                value="{{ $user->email }}" required @if($user->roles == 'pegawai')
-                                            readonly @endif>
+                                                value="{{ $user->email }}" required
+                                                @if ($user->roles == 'pegawai') readonly @endif>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label for="gender" class="form-control-label">Gender</label>
                                             <select class="form-control" id="gender" name="gender" required
-                                                @if($user->roles == 'pegawai') disabled @endif>
+                                                @if ($user->roles == 'pegawai') disabled @endif>
                                                 <option value="Laki-Laki"
                                                     {{ $user->gender == 'Laki-Laki' ? 'selected' : '' }}>Laki - Laki
                                                 </option>
@@ -154,7 +155,7 @@
                                         <div class="form-group">
                                             <label for="alamat" class="form-control-label">Alamat</label>
                                             <textarea class="form-control" id="alamat" name="alamat" required
-                                                @if($user->roles == 'pegawai') readonly @endif>{{ $user->alamat }}</textarea>
+                                                @if ($user->roles == 'pegawai') readonly @endif>{{ $user->alamat }}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -261,7 +262,6 @@
                 }
                 Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
             }
-
         </script>
         <!-- Github buttons -->
         <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -269,11 +269,11 @@
         <script src="{{ asset('/assets/js/argon-dashboard.min.js?v=2.0.4') }}"></script>
 
         <script>
-            document.addEventListener('DOMContentLoaded', function () {
+            document.addEventListener('DOMContentLoaded', function() {
                 const toggleRekening = document.getElementById('toggleRekening');
                 const nomorRekening = document.getElementById('nomorRekening');
 
-                toggleRekening.addEventListener('click', function () {
+                toggleRekening.addEventListener('click', function() {
                     if (nomorRekening.classList.contains('d-none')) {
                         nomorRekening.classList.remove('d-none');
                         toggleRekening.textContent = 'Tampilkan Nomor Rekening lagi';
@@ -283,7 +283,6 @@
                     }
                 });
             });
-
         </script>
 </body>
 

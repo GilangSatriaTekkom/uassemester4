@@ -21,14 +21,14 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
     <title>
-        @if(session('type') == 'withdrawal')
-        Tarik Saldo
+        @if (session('type') == 'withdrawal')
+            Tarik Saldo
         @elseif(session('type') == 'deposit')
-        Deposit Saldo
+            Deposit Saldo
         @elseif(session('type') == 'transfer')
-        Transfer Saldo
+            Transfer Saldo
         @else
-        Saldo
+            Saldo
         @endif
     </title>
     <!--     Fonts and icons     -->
@@ -65,7 +65,6 @@
             background-color: #fff;
             border-bottom: 1px solid #d4d4d4;
         }
-
     </style>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -81,13 +80,13 @@
     <main class="main-content position-relative border-radius-lg ">
         @include('layouts.top_navbar')
         @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
         <div class="container-fluid py-4">
             <div class="row">
@@ -95,19 +94,19 @@
                     <div class="card mb-4">
                         <div class="card-header pb-0">
                             <h6>
-                            @php
-    $type = Request::segment(3); // Mengambil segmen ketiga dari URL
-@endphp
+                                @php
+                                    $type = Request::segment(3); // Mengambil segmen ketiga dari URL
+                                @endphp
 
-@if($type == 'withdrawal')
-    Tarik Saldo
-@elseif($type == 'deposit')
-    Deposit Saldo
-@elseif($type == 'transfer')
-    Transfer Saldo
-@else
-    Saldo
-@endif
+                                @if ($type == 'withdrawal')
+                                    Tarik Saldo
+                                @elseif($type == 'deposit')
+                                    Deposit Saldo
+                                @elseif($type == 'transfer')
+                                    Transfer Saldo
+                                @else
+                                    Saldo
+                                @endif
 
                             </h6>
 
@@ -117,30 +116,81 @@
                             <div class="table-responsive p-0 table align-items-center mb-0">
                                 <span class="navbar-text"
                                     style="display: flex;flex-direction: row-reverse;padding-right: 25px;font-weight: bold;">
-                                    Saldo: {{ $formattedSaldo}}
+                                    Saldo: {{ $formattedSaldo }}
                                 </span>
                             </div>
-                            <form action="{{ route('transactions.store', ['type' => $type, 'id' => $id]) }}"
+                            <form id="transactionForm"
+                                action="{{ route('transactions.store', ['type' => $type, 'id' => $id]) }}"
                                 method="POST">
                                 @csrf
-                                @if($type != 'withdrawal')
-                                <div class="form-group" style="padding-left: 25px; padding-right: 25px;">
-                                    <label for="nama">Nama</label>
-                                    <input type="text" class="form-control" id="nama" name="nama" required>
-                                </div>
-                                <div class="form-group" style="padding-left: 25px; padding-right: 25px;">
-                                    <label for="nomor_rekening">Nomor Rekening</label>
-                                    <input type="text" class="form-control" id="nomor_rekening" name="nomor_rekening"
-                                        required readonly>
-                                </div>
+                                @if ($type != 'withdrawal')
+                                    <div class="form-group" style="padding-left: 25px; padding-right: 25px;">
+                                        <label for="nama">Nama</label>
+                                        <input type="text" class="form-control" id="nama" name="nama"
+                                            required>
+                                    </div>
+                                    <div class="form-group" style="padding-left: 25px; padding-right: 25px;">
+                                        <label for="nomor_rekening">Nomor Rekening</label>
+                                        <input type="text" class="form-control" id="nomor_rekening"
+                                            name="nomor_rekening" required readonly>
+                                    </div>
                                 @endif
                                 <div class="form-group" style="padding-left: 25px; padding-right: 25px;">
                                     <label for="jumlah_transaksi">Jumlah {{ ucfirst($type) }}</label>
                                     <input type="number" class="form-control" id="jumlah_transaksi"
                                         name="jumlah_transaksi" required>
                                 </div>
-                                <button type="submit" class="btn btn-primary" style="margin-left: 25px;">Submit</button>
+                                <button type="button" class="btn btn-primary" style="margin-left: 25px;"
+                                    id="submitButton">Submit</button>
                             </form>
+
+                            <!-- Modal -->
+                            <div class="modal fade" id="confirmationModal" tabindex="-1"
+                                aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="confirmationModalLabel">Konfirmasi Transaksi
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Nama Penerima: <span id="confirmNama"></span></p>
+                                            <p>Rekening Penerima: <span id="confirmRekening"></span></p>
+                                            <p>Jumlah yang akan di transfer: <span id="confirmJumlah"></span></p>
+                                            <p>Apakah penerima sudah sesuai?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary"
+                                                data-bs-dismiss="modal">Batal</button>
+                                            <button type="button" class="btn btn-primary" id="confirmButton">Ya,
+                                                Lanjutkan</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                                document.getElementById('submitButton').addEventListener('click', function() {
+                                    var type = "{{ $type }}";
+                                    if (type === 'transfer') {
+                                        document.getElementById('confirmNama').innerText = document.getElementById('nama').value;
+                                        document.getElementById('confirmRekening').innerText = document.getElementById('nomor_rekening')
+                                            .value;
+                                        document.getElementById('confirmJumlah').innerText = document.getElementById('jumlah_transaksi')
+                                            .value;
+                                        var confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+                                        confirmationModal.show();
+                                    } else {
+                                        document.getElementById('transactionForm').submit();
+                                    }
+                                });
+
+                                document.getElementById('confirmButton').addEventListener('click', function() {
+                                    document.getElementById('transactionForm').submit();
+                                });
+                            </script>
                         </div>
                     </div>
                 </div>
@@ -152,9 +202,9 @@
                 <div class="row align-items-center justify-content-lg-between">
                     <div class="col-lg-6 mb-lg-0 mb-4">
                         <div class="copyright text-center text-sm text-muted text-lg-start">
-                            © <script>
+                            ©
+                            <script>
                                 document.write(new Date().getFullYear())
-
                             </script>,
                             made with <i class="fa fa-heart"></i> by
                             <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative
@@ -286,7 +336,7 @@
     <script>
         function autocomplete(inp, arr) {
             var currentFocus;
-            inp.addEventListener("input", function (e) {
+            inp.addEventListener("input", function(e) {
                 var a, b, i, val = this.value;
                 closeAllLists();
                 if (!val) {
@@ -303,7 +353,7 @@
                         b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
                         b.innerHTML += arr[i].substr(val.length);
                         b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
-                        b.addEventListener("click", function (e) {
+                        b.addEventListener("click", function(e) {
                             inp.value = this.getElementsByTagName("input")[0].value;
                             fetchRekening(inp.value);
                             closeAllLists();
@@ -313,7 +363,7 @@
                 }
             });
 
-            inp.addEventListener("keydown", function (e) {
+            inp.addEventListener("keydown", function(e) {
                 var x = document.getElementById(this.id + "autocomplete-list");
                 if (x) x = x.getElementsByTagName("div");
                 if (e.keyCode == 40) {
@@ -353,7 +403,7 @@
                 }
             }
 
-            document.addEventListener("click", function (e) {
+            document.addEventListener("click", function(e) {
                 closeAllLists(e.target);
             });
         }
@@ -365,7 +415,7 @@
                 data: {
                     nama: nama
                 },
-                success: function (data) {
+                success: function(data) {
                     if (data.nomor_rekening) {
                         $('#nomor_rekening').val(data.nomor_rekening);
                     }
@@ -373,20 +423,19 @@
             });
         }
 
-        $(document).ready(function () {
+        $(document).ready(function() {
             $.ajax({
                 url: "{{ route('api.rekening.suggest') }}",
                 method: 'GET',
                 data: {
                     term: ''
                 },
-                success: function (data) {
+                success: function(data) {
                     var names = data.map(user => user.nama);
                     autocomplete(document.getElementById("nama"), names);
                 }
             });
         });
-
     </script>
 
     <script>
@@ -397,7 +446,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

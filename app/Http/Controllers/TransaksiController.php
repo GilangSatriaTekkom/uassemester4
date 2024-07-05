@@ -55,7 +55,7 @@ class TransaksiController extends Controller
             return redirect()->back()->withErrors(['nomor_rekening' => 'Rekening penerima tidak ditemukan.']);
         }
 
-        // Check if recipient's account number is the same as sender's for withdrawals and transfers
+        // Check if recipient's account number is the same as sender's for transfers
         if (($type == 'transfer') && $rekening_pengirim->nomor_rekening == $request->nomor_rekening) {
             return redirect()->back()->withErrors(['nomor_rekening' => 'Nomor rekening penerima tidak boleh sama dengan nomor rekening pengirim.']);
         }
@@ -65,6 +65,7 @@ class TransaksiController extends Controller
             return redirect()->back()->withErrors(['jumlah_transaksi' => 'Jumlah tabungan tidak mencukupi.']);
         }
 
+        // Begin transaction
         DB::beginTransaction();
 
         try {
@@ -119,8 +120,11 @@ class TransaksiController extends Controller
             // Commit the transaction
             DB::commit();
 
-            // Trigger the notification
-        $rekening_penerima->notify(new TransactionNotification($type, $request->jumlah_transaksi));
+            // Trigger the notification for the logged-in user
+            Auth::user()->notify(new TransactionNotification($type, $request->jumlah_transaksi));
+
+            // Redirect user with success message if needed
+            return redirect()->back()->with('success', 'Transaksi berhasil dilakukan.');
 
         } catch (\Exception $e) {
             // Rollback the transaction if an error occurs
@@ -129,8 +133,9 @@ class TransaksiController extends Controller
             return redirect()->back()->withErrors(['error' => 'Terjadi kesalahan saat memproses transaksi.']);
         }
 
-        return redirect()->route('transactions.create', ['type' => $type, 'id' => $id])->with('success', ucfirst($type) . ' saldo berhasil.');
-    }
+    return redirect()->route('transactions.create', ['type' => $type, 'id' => $id])->with('success', ucfirst($type) . ' saldo berhasil.');
+}
+
 
     public function history($id)
     {
@@ -149,7 +154,7 @@ class TransaksiController extends Controller
     {
         $term = $request->get('term');
         $users = User::where('name', 'LIKE', '%' . $term . '%')->get();
-    
+
         $results = [];
         foreach ($users as $user) {
             $rekening = TabelRekening::where('id', $user->id)->first();
@@ -160,7 +165,7 @@ class TransaksiController extends Controller
                 ];
             }
         }
-    
+
         if ($request->has('nama')) {
             $user = User::where('name', $request->get('nama'))->first();
             if ($user) {
@@ -170,7 +175,7 @@ class TransaksiController extends Controller
                 }
             }
         }
-    
+
         return response()->json($results);
     }
 }

@@ -43,14 +43,14 @@
     height: 100vh;">
         @include('layouts.top_navbar')
         @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <div class="container-fluid py-4 h-100" style="
     display: flex;
@@ -62,13 +62,13 @@
                             <div class="row">
                                 <div class="col-8">
                                     @foreach ($tabungans as $tabungan)
-                                    <div class="numbers">
-                                        <p class="text-sm mb-0 text-uppercase font-weight-bold">Saldo</p>
-                                        <h5 class="font-weight-bolder">
-                                            {{ 'Rp.' . number_format($tabungan->jumlah_tabungan, 0, ',', '.') . ',00' }}
-                                        </h5>
-                                        
-                                    </div>
+                                        <div class="numbers">
+                                            <p class="text-sm mb-0 text-uppercase font-weight-bold">Saldo</p>
+                                            <h5 class="font-weight-bolder">
+                                                {{ 'Rp.' . number_format($tabungan->jumlah_tabungan, 0, ',', '.') . ',00' }}
+                                            </h5>
+
+                                        </div>
                                     @endforeach
                                 </div>
                                 <div class="col-4 text-end">
@@ -91,7 +91,7 @@
                                         <h5 class="font-weight-bolder">
                                             {{ $saldoMasuk ? 'Rp.' . number_format($saldoMasuk, 0, ',', '.') . ',00' : 'Tidak ada saldo masuk' }}
                                         </h5>
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-4 text-end">
@@ -115,7 +115,7 @@
                                         <h5 class="font-weight-bolder">
                                             {{ $saldoKeluar ? 'Rp.' . number_format($saldoKeluar, 0, ',', '.') . ',00' : 'Tidak ada saldo keluar' }}
                                         </h5>
-                                        
+
                                     </div>
                                 </div>
                                 <div class="col-4 text-end">
@@ -158,15 +158,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($transaksis as $transaksi)
-                                    <tr>
-                                        <td class="align-middle text-center text-sm">{{ $transaksi->Id_transaksi }}</td>
-                                        <td class="align-middle text-center text-sm">{{ $transaksi->tipe_transaksi }}
-                                        </td>
-                                        <td class="align-middle text-center text-sm">{{ $transaksi->jumlah_transaksi }}
-                                        </td>
-                                        <td class="align-middle text-center text-sm">{{ $transaksi->created_at }}</td>
-                                        @endforeach
+
+                                    @foreach ($transaksis as $index => $transaksi)
+                                        <tr>
+                                            <td class="align-middle text-center text-sm">{{ $index + 1 }}</td>
+                                            <td class="align-middle text-center text-sm">
+                                                {{ $transaksi->tipe_transaksi }}
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                {{ $transaksi->jumlah_transaksi }}
+                                            </td>
+                                            <td class="align-middle text-center text-sm">
+                                                {{ \Carbon\Carbon::parse($transaksi->created_at)->translatedFormat('d F Y H:i:s') }}
+                                            </td>
+                                    @endforeach
                                 </tbody>
 
 
@@ -180,9 +185,9 @@
                     <div class="row align-items-center justify-content-lg-between">
                         <div class="col-lg-6 mb-lg-0 mb-4">
                             <div class="copyright text-center text-sm text-muted text-lg-start">
-                                © <script>
+                                ©
+                                <script>
                                     document.write(new Date().getFullYear())
-
                                 </script>,
                                 made with <i class="fa fa-heart"></i> by
                                 <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative
@@ -394,7 +399,6 @@
                 },
             },
         });
-
     </script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -404,7 +408,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

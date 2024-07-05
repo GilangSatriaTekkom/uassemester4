@@ -39,13 +39,13 @@
     <div class="min-height-300 bg-primary position-absolute w-100"></div>
     @extends('layouts.navbar')
     @if ($errors->any())
-    <div class="alert alert-danger">
-        <ul>
-            @foreach ($errors->all() as $error)
-            <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
     <div class="main-content position-relative max-height-vh-100 h-100">
         <div class="container-fluid py-4 h-75">
@@ -58,76 +58,79 @@
                                     <div class="card-header">Edit Laporan</div>
 
                                     <div class="card-body">
-                                        @if($laporan)
-                                        <form method="POST"
-                                            action="{{ route('admin.laporan.update', ['id' => $user->id, 'id_laporan' => $laporan->Id_laporan]) }}">
-                                            @csrf
-                                            @method('PUT')
-                                            <div class="form-group">
-                                                <label for="tanggal">Tanggal</label>
-                                                <input type="date" class="form-control" id="tanggal" name="tanggal"
-                                                    value="{{ $laporan->tanggal }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jam">Jam</label>
-                                                <input type="time" class="form-control" id="jam" name="jam"
-                                                    value="{{ $laporan->jam }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nama_pegawai">Nama Pegawai</label>
-                                                <select class="form-control" id="nama_pegawai" name="nama_pegawai">
-                                                    @foreach($users as $pegawai)
-                                                    @if($pegawai->level == 'pegawai')
-                                                    <option value="{{ $pegawai->id }}"
-                                                        {{ $laporan->id_pegawai == $pegawai->id ? 'selected' : '' }}>
-                                                        {{ $pegawai->name }}</option>
-                                                    @endif
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="nama_nasabah">Nama Nasabah</label>
-                                                <select class="form-control" id="nama_nasabah" name="nama_nasabah">
-                                                    @foreach($users as $nasabah)
-                                                    @if($nasabah->level == 'nasabah')
-                                                    <option value="{{ $nasabah->id }}"
-                                                        {{ $laporan->id_nasabah == $nasabah->id ? 'selected' : '' }}>
-                                                        {{ $nasabah->name }}</option>
-                                                    @endif
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_koin_100">Jumlah Koin 100</label>
-                                                <input type="number" class="form-control" id="jumlah_koin_100"
-                                                    name="jumlah_koin_100" value="{{ $laporan->jumlah_koin_100 }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_koin_200">Jumlah Koin 200</label>
-                                                <input type="number" class="form-control" id="jumlah_koin_200"
-                                                    name="jumlah_koin_200" value="{{ $laporan->jumlah_koin_200 }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_koin_500">Jumlah Koin 500</label>
-                                                <input type="number" class="form-control" id="jumlah_koin_500"
-                                                    name="jumlah_koin_500" value="{{ $laporan->jumlah_koin_500 }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_koin_1000">Jumlah Koin 1000</label>
-                                                <input type="number" class="form-control" id="jumlah_koin_1000"
-                                                    name="jumlah_koin_1000" value="{{ $laporan->jumlah_koin_1000 }}">
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="jumlah_rupiah">Jumlah Rupiah</label>
-                                                <input type="number" class="form-control" id="jumlah_rupiah"
-                                                    name="jumlah_rupiah" value="{{ $laporan->jumlah_rupiah }}" readonly>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Save</button>
-                                        </form>
+                                        @if ($laporan)
+                                            <form method="POST"
+                                                action="{{ route('admin.laporan.update', ['id' => $user->id, 'id_laporan' => $laporan->Id_laporan]) }}">
+                                                @csrf
+                                                @method('PUT')
+                                                <div class="form-group">
+                                                    <label for="tanggal">Tanggal</label>
+                                                    <input type="date" class="form-control" id="tanggal"
+                                                        name="tanggal" value="{{ $laporan->tanggal }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jam">Jam</label>
+                                                    <input type="time" class="form-control" id="jam"
+                                                        name="jam" value="{{ $laporan->jam }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nama_pegawai">Nama Pegawai</label>
+                                                    <select class="form-control" id="nama_pegawai" name="nama_pegawai">
+                                                        @foreach ($users as $pegawai)
+                                                            @if ($pegawai->level == 'pegawai')
+                                                                <option value="{{ $pegawai->id }}"
+                                                                    {{ $laporan->id_pegawai == $pegawai->id ? 'selected' : '' }}>
+                                                                    {{ $pegawai->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="nama_nasabah">Nama Nasabah</label>
+                                                    <select class="form-control" id="nama_nasabah" name="nama_nasabah">
+                                                        @foreach ($users as $nasabah)
+                                                            @if ($nasabah->level == 'nasabah')
+                                                                <option value="{{ $nasabah->id }}"
+                                                                    {{ $laporan->id_nasabah == $nasabah->id ? 'selected' : '' }}>
+                                                                    {{ $nasabah->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jumlah_koin_100">Jumlah Koin 100</label>
+                                                    <input type="number" class="form-control" id="jumlah_koin_100"
+                                                        name="jumlah_koin_100" value="{{ $laporan->jumlah_koin_100 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jumlah_koin_200">Jumlah Koin 200</label>
+                                                    <input type="number" class="form-control" id="jumlah_koin_200"
+                                                        name="jumlah_koin_200" value="{{ $laporan->jumlah_koin_200 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jumlah_koin_500">Jumlah Koin 500</label>
+                                                    <input type="number" class="form-control" id="jumlah_koin_500"
+                                                        name="jumlah_koin_500" value="{{ $laporan->jumlah_koin_500 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jumlah_koin_1000">Jumlah Koin 1000</label>
+                                                    <input type="number" class="form-control" id="jumlah_koin_1000"
+                                                        name="jumlah_koin_1000"
+                                                        value="{{ $laporan->jumlah_koin_1000 }}">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="jumlah_rupiah">Jumlah Rupiah</label>
+                                                    <input type="number" class="form-control" id="jumlah_rupiah"
+                                                        name="jumlah_rupiah" value="{{ $laporan->jumlah_rupiah }}"
+                                                        readonly>
+                                                </div>
+                                                <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                                                    data-bs-target="#confirmUpdateModal">Save</button>
+                                            </form>
                                         @else
-                                        <div class="alert alert-danger">
-                                            Data laporan tidak ditemukan.
-                                        </div>
+                                            <div class="alert alert-danger">
+                                                Data laporan tidak ditemukan.
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
@@ -135,7 +138,6 @@
                         </div>
                     </div>
 
-
                     <!-- Modal Konfirmasi Update -->
                     <div class="modal fade" id="confirmUpdateModal" tabindex="-1"
                         aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
@@ -152,62 +154,15 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary"
                                         data-bs-dismiss="modal">Tutup</button>
-                                    <button type="submit" class="btn btn-primary">Ya, Update</button>
+                                    <button type="button" class="btn btn-primary"
+                                        onclick="document.querySelector('form').submit();">Ya, Update</button>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <!-- Modal Konfirmasi Update -->
-                    <div class="modal fade" id="confirmUpdateModal" tabindex="-1"
-                        aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmUpdateModalLabel">Konfirmasi Update</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    Apakah Anda yakin ingin melakukan update data?
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary"
-                                        data-bs-dismiss="modal">Tutup</button>
-                                    <button type="submit" class="btn btn-primary">Ya, Update</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <hr class="horizontal dark">
-
-                <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel"
-                    aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="confirmUpdateModalLabel">Konfirmasi Update
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                    aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                Apakah Anda yakin ingin melakukan update data?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                                <button type="submit" class="btn btn-primary">Ya, Update</button>
                             </div>
                         </div>
                     </div>
                 </div>
-                </form>
             </div>
         </div>
-    </div>
     </div>
     </div>
     <div class="fixed-plugin">
@@ -305,7 +260,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>
@@ -313,7 +267,7 @@
     <script src="{{ asset('/assets/js/argon-dashboard.min.js?v=2.0.4') }}"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const koin100 = document.getElementById('jumlah_koin_100');
             const koin200 = document.getElementById('jumlah_koin_200');
             const koin500 = document.getElementById('jumlah_koin_500');
@@ -335,7 +289,6 @@
 
             calculateTotal();
         });
-
     </script>
 </body>
 

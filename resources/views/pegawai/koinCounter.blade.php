@@ -21,14 +21,14 @@
     <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}">
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
     <title>
-        @if(session('type') == 'withdrawal')
-        Tarik Saldo
+        @if (session('type') == 'withdrawal')
+            Tarik Saldo
         @elseif(session('type') == 'deposit')
-        Deposit Saldo
+            Deposit Saldo
         @elseif(session('type') == 'transfer')
-        Transfer Saldo
+            Transfer Saldo
         @else
-        Saldo
+            Saldo
         @endif
     </title>
     <!--     Fonts and icons     -->
@@ -41,6 +41,8 @@
     <link href="{{ asset('/assets/css/nucleo-svg.css') }}" rel="stylesheet" />
     <!-- CSS Files -->
     <link id="pagestyle" href="{{ asset('/assets/css/argon-dashboard.css?v=2.0.4') }}" rel="stylesheet" />
+    <!-- jQuery UI CSS -->
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 
 <body class="g-sidenav-show   bg-gray-100">
@@ -50,13 +52,13 @@
     <main class="main-content position-relative border-radius-lg ">
         @include('layouts.top_navbar')
         @if ($errors->any())
-        <div class="alert alert-danger">
-            <ul>
-                @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
         @endif
         <div class="container-fluid py-4">
             <div class="row">
@@ -70,8 +72,8 @@
                         <div class="card-body px-0 pt-0 pb-2">
                             <div class="align-items-center mb-0">
 
-                                
-   
+
+
 
                                 <!-- <div class="form-check">
                                     <input type="checkbox" id="limitCheckbox" class="form-check-input"
@@ -121,76 +123,81 @@
                                     </li>
                                 </ul>
 
-                                
 
-                                <form method="POST" action="{{ route('updateReport', ['id' => $user->id]) }}" class="mt-3">
-    @csrf
 
-    <!-- Input hidden untuk nama pegawai -->
-    <input type="hidden" id="nama_pegawai" name="nama_pegawai" value="{{ Auth::user()->name }}">
+                                <form method="POST" action="{{ route('updateReport', ['id' => $user->id]) }}"
+                                    class="mt-3">
+                                    @csrf
 
-    <!-- Input untuk nama nasabah -->
-    <div class="form-group">
-        <label for="nama_nasabah">Nama Nasabah</label>
-        <input type="text" class="form-control" id="nama_nasabah" name="nama_nasabah" value="{{ old('nama_nasabah') }}" required>
-    </div>
+                                    <!-- Input hidden untuk nama pegawai -->
+                                    <input type="hidden" id="nama_pegawai" name="nama_pegawai"
+                                        value="{{ Auth::user()->name }}">
 
-    <!-- Flex container for buttons -->
-    
-</form>
+                                    <!-- Input untuk nama nasabah -->
+                                    <div class="form-group">
+                                        <label for="nama_nasabah">Nama Nasabah</label>
+                                        <input type="text" class="form-control" id="nama_nasabah" name="nama_nasabah"
+                                            value="{{ old('nama_nasabah') }}" required>
+                                    </div>
 
-<div class="d-flex justify-content-between mt-3">
-        <button type="submit" class="btn btn-success">Update</button>
-        <form method="POST" action="{{ route('resetCounter') }}">
-            @csrf
-            <button type="submit" class="btn btn-danger">Reset Counter</button>
-        </form>
-    </div>
+                                    <!-- Flex container for buttons -->
 
+
+
+                                    <div class="d-flex justify-content-between mt-3">
+                                        <button type="submit" class="btn btn-success">Update</button>
+                                </form>
+
+                                <form method="POST" action="{{ route('resetCounter') }}">
+                                    @csrf
+                                    <button type="submit" class="btn btn-danger">Reset Counter</button>
+                                </form>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <footer class="footer pt-3">
-                <div class="container-fluid">
-                    <div class="row align-items-center justify-content-lg-between">
-                        <div class="col-lg-6 mb-lg-0 mb-4">
-                            <div class="copyright text-center text-sm text-muted text-lg-start">
-                                © <script>
-                                    document.write(new Date().getFullYear())
-
-                                </script>,
-                                made with <i class="fa fa-heart"></i> by
-                                <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative
-                                    Tim</a>
-                                for a better web.
-                            </div>
-                        </div>
-                        <div class="col-lg-6">
-                            <ul class="nav nav-footer justify-content-center justify-content-lg-end">
-                                <li class="nav-item">
-                                    <a href="https://www.creative-tim.com" class="nav-link text-muted"
-                                        target="_blank">Creative Tim</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted"
-                                        target="_blank">About Us</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="https://www.creative-tim.com/blog" class="nav-link text-muted"
-                                        target="_blank">Blog</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted"
-                                        target="_blank">License</a>
-                                </li>
-                            </ul>
+        <footer class="footer pt-3">
+            <div class="container-fluid">
+                <div class="row align-items-center justify-content-lg-between">
+                    <div class="col-lg-6 mb-lg-0 mb-4">
+                        <div class="copyright text-center text-sm text-muted text-lg-start">
+                            ©
+                            <script>
+                                document.write(new Date().getFullYear())
+                            </script>,
+                            made with <i class="fa fa-heart"></i> by
+                            <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative
+                                Tim</a>
+                            for a better web.
                         </div>
                     </div>
+                    <div class="col-lg-6">
+                        <ul class="nav nav-footer justify-content-center justify-content-lg-end">
+                            <li class="nav-item">
+                                <a href="https://www.creative-tim.com" class="nav-link text-muted"
+                                    target="_blank">Creative Tim</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://www.creative-tim.com/presentation" class="nav-link text-muted"
+                                    target="_blank">About Us</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://www.creative-tim.com/blog" class="nav-link text-muted"
+                                    target="_blank">Blog</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="https://www.creative-tim.com/license" class="nav-link pe-0 text-muted"
+                                    target="_blank">License</a>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-            </footer>
+            </div>
+        </footer>
         </div>
     </main>
     <div class="fixed-plugin">
@@ -370,7 +377,6 @@
                 },
             },
         });
-
     </script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -380,7 +386,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
 
     <!-- scipt COunter -->
@@ -388,7 +393,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Fetch initial coin counts
             updateCoinCounts();
             setInterval(fetchCoinCounts, 1000); // Fetch data every 10 seconds
@@ -434,15 +439,15 @@
         });
 
         // Example of how to call controlRelay function
-        document.getElementById('startMachineBtn').addEventListener('click', function () {
+        document.getElementById('startMachineBtn').addEventListener('click', function() {
             controlRelay('start');
         });
 
-        document.getElementById('stopMachineBtn').addEventListener('click', function () {
+        document.getElementById('stopMachineBtn').addEventListener('click', function() {
             controlRelay('stop');
         });
 
-        document.getElementById('resetCounterForm').addEventListener('submit', function (event) {
+        document.getElementById('resetCounterForm').addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent form from submitting normally
 
             if (confirm('Apakah Anda yakin untuk mereset counter?')) {
@@ -517,7 +522,30 @@
                     }
                 });
         }
+    </script>
 
+    <!-- jQuery and jQuery UI -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            $("#nama_nasabah").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url: "{{ route('api.koin-counter.suggest') }}",
+                        data: {
+                            term: request.term
+                        },
+                        dataType: "json",
+                        success: function(data) {
+                            response(data);
+                        }
+                    });
+                },
+                minLength: 2,
+            });
+        });
     </script>
 
 

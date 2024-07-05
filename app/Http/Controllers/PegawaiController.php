@@ -14,8 +14,8 @@ class PegawaiController extends Controller
 {
     public function dashboard($id)
     {
-        // Example: Fetching records based on $id
-        $laporan = TabelLaporan::where('id_laporan', $id)->get();
+        // Fetching records created today
+        $laporan = TabelLaporan::whereDate('tanggal', Carbon::today())->get();
 
         // Process $laporan as needed
         return view('pegawai.dashboardPegawai', compact('laporan'));

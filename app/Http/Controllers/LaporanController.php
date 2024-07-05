@@ -22,23 +22,25 @@ class LaporanController extends Controller
         $laporan = DB::table('tabel_laporan')
             ->join('users as nasabah', 'tabel_laporan.nama_nasabah', '=', 'nasabah.id')
             ->join('users as pegawai', 'tabel_laporan.nama_pegawai', '=', 'pegawai.id')
-            ->select('tabel_laporan.id_laporan', 
+            ->select('tabel_laporan.id_laporan',
                     'tabel_laporan.jumlah_koin_100', 'tabel_laporan.jumlah_koin_200',
                     'tabel_laporan.jumlah_koin_500', 'tabel_laporan.jumlah_koin_1000',
                     'tabel_laporan.jumlah_rupiah', 'nasabah.name as nama_nasabah',
-                    'pegawai.name as nama_pegawai')
-            ->whereDate('tabel_laporan.created_at', Carbon::today()) // Filter untuk hari ini saja
+                    'pegawai.name as nama_pegawai',
+                    'tabel_laporan.tanggal', 'tabel_laporan.jam') // Tambahkan tanggal dan jam
+            ->whereDate('tabel_laporan.tanggal', Carbon::today()) // Filter untuk hari ini saja
             ->get();
     } else {
         // Jika user adalah admin, ambil semua laporan
         $laporan = DB::table('tabel_laporan')
             ->join('users as nasabah', 'tabel_laporan.nama_nasabah', '=', 'nasabah.id')
             ->join('users as pegawai', 'tabel_laporan.nama_pegawai', '=', 'pegawai.id')
-            ->select('tabel_laporan.id_laporan', 
+            ->select('tabel_laporan.id_laporan',
                      'tabel_laporan.jumlah_koin_100', 'tabel_laporan.jumlah_koin_200',
                      'tabel_laporan.jumlah_koin_500', 'tabel_laporan.jumlah_koin_1000',
                      'tabel_laporan.jumlah_rupiah', 'nasabah.name as nama_nasabah',
                      'pegawai.name as nama_pegawai',
+                     'tabel_laporan.tanggal', 'tabel_laporan.jam', // Tambahkan tanggal dan jam
                      'tabel_laporan.created_at', 'tabel_laporan.updated_at') // Ambil created_at dan updated_at
             ->get();
     }
@@ -87,42 +89,82 @@ class LaporanController extends Controller
 public function update(Request $request, $id, $id_laporan)
 {
     $laporan = TabelLaporan::where('Id_laporan', $id_laporan)->first();
-    
+
     if (!$laporan) {
         // Handle error or return a response indicating the laporan was not found
         return redirect()->back()->with('error', 'Laporan tidak ditemukan.');
     }
 
-    // Update fields
+    // Log the incoming request data
+    \Log::debug('Request data: ', $request->all());
 
-    $laporan->nama_pegawai = $request->nama_pegawai;
-    $laporan->nama_nasabah = $request->nama_nasabah;
-    $laporan->jumlah_koin_100 = $request->jumlah_koin_100;
-    $laporan->jumlah_koin_200 = $request->jumlah_koin_200;
-    $laporan->jumlah_koin_500 = $request->jumlah_koin_500;
-    $laporan->jumlah_koin_1000 = $request->jumlah_koin_1000;
-    
+    // Validasi input
+    $request->validate([
+        'nama_pegawai' => 'required|exists:users,id',
+        'nama_nasabah' => 'required|exists:users,id',
+        'jumlah_koin_100' => 'required|numeric',
+        'jumlah_koin_200' => 'required|numeric',
+        'jumlah_koin_500' => 'required|numeric',
+        'jumlah_koin_1000' => 'required|numeric',
+    ]);
+
     // Hitung jumlah rupiah
-    $laporan->jumlah_rupiah = ($laporan->jumlah_koin_100 * 100) +
-                               ($laporan->jumlah_koin_200 * 200) +
-                               ($laporan->jumlah_koin_500 * 500) +
-                               ($laporan->jumlah_koin_1000 * 1000);
+    $jumlah_rupiah = ($request->jumlah_koin_100 * 100) +
+                     ($request->jumlah_koin_200 * 200) +
+                     ($request->jumlah_koin_500 * 500) +
+                     ($request->jumlah_koin_1000 * 1000);
 
-    $laporan->save();
+    // Update fields using raw SQL
+    $updated = DB::update('UPDATE tabel_laporan SET nama_pegawai = ?, nama_nasabah = ?, jumlah_koin_100 = ?, jumlah_koin_200 = ?, jumlah_koin_500 = ?, jumlah_koin_1000 = ?, jumlah_rupiah = ? WHERE id_laporan = ?', [
+        $request->nama_pegawai,
+        $request->nama_nasabah,
+        $request->jumlah_koin_100,
+        $request->jumlah_koin_200,
+        $request->jumlah_koin_500,
+        $request->jumlah_koin_1000,
+        $jumlah_rupiah,
+        $id_laporan
+    ]);
 
-    // Log debug message
-    \Log::info('Laporan updated: ' . $laporan->toJson());
+    // Log the updated laporan data
+    \Log::debug('Updated laporan data: ', [
+        'nama_pegawai' => $request->nama_pegawai,
+        'nama_nasabah' => $request->nama_nasabah,
+        'jumlah_koin_100' => $request->jumlah_koin_100,
+        'jumlah_koin_200' => $request->jumlah_koin_200,
+        'jumlah_koin_500' => $request->jumlah_koin_500,
+        'jumlah_koin_1000' => $request->jumlah_koin_1000,
+        'jumlah_rupiah' => $jumlah_rupiah
+    ]);
+
+    if ($updated) {
+        \Log::info('Laporan updated: ' . json_encode([
+            'id_laporan' => $id_laporan,
+            'nama_pegawai' => $request->nama_pegawai,
+            'nama_nasabah' => $request->nama_nasabah,
+            'jumlah_koin_100' => $request->jumlah_koin_100,
+            'jumlah_koin_200' => $request->jumlah_koin_200,
+            'jumlah_koin_500' => $request->jumlah_koin_500,
+            'jumlah_koin_1000' => $request->jumlah_koin_1000,
+            'jumlah_rupiah' => $jumlah_rupiah
+        ]));
+    } else {
+        \Log::error('Failed to update laporan: ' . $id_laporan);
+    }
 
     return redirect()->route('admin.laporan.edit', ['id' => $id, 'id_laporan' => $id_laporan])
                      ->with('success', 'Laporan berhasil diupdate.');
-}   
+}
 
-    public function destroy($id)
+    public function destroy($id, $id_laporan)
     {
-        $laporan = TabelLaporan::findOrFail($id);
-        $laporan->delete();
+        $deleted = DB::table('tabel_laporan')->where('id_laporan', $id_laporan)->delete();
 
-        return redirect()->back()->with('success', 'Laporan berhasil dihapus');
+        if ($deleted) {
+            return redirect()->route('admin.laporan.show', ['id' => $id])->with('success', 'Laporan berhasil dihapus');
+        } else {
+            return redirect()->route('admin.laporan.show', ['id' => $id])->with('error', 'Laporan tidak ditemukan');
+        }
     }
 
     public function filter(Request $request)
@@ -135,16 +177,5 @@ public function update(Request $request, $id, $id_laporan)
         return view('laporan', compact('laporan'));
     }
 
-    public function search(Request $request)
-    {
-        $searchTerm = $request->input('search');
-
-        $laporan = TabelLaporan::where('nama_nasabah', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('nama_pegawai', 'like', '%' . $searchTerm . '%')
-                    ->orWhere('tanggal', 'like', '%' . $searchTerm . '%')
-                    ->get();
-
-        return view('laporan', compact('laporan'));
-    }
 
 }

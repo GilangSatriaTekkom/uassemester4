@@ -8,7 +8,7 @@ use App\Models\TabelLaporan;
 use App\Models\counterModel;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -93,7 +93,7 @@ class KoinController extends Controller
             'coin500' => 0,
             'coin1000' => 0,
             'totalAmount' => 'Rp.0,00',
-            
+
         ];
 
         foreach ($coinCounts as $coin) {
@@ -139,13 +139,21 @@ class KoinController extends Controller
     }
 }
 
-    
+    public function suggestNasabah(Request $request)
+    {
+        $search = $request->get('term');
+        $result = User::where('level', 'nasabah')
+                      ->where('name', 'LIKE', '%' . $search . '%')
+                      ->pluck('name');
+
+        return response()->json($result);
+    }
 
     public function update(Request $request, $id)
 {
     $validatedData = $request->validate([
         'nama_nasabah' => 'required|string',
-        
+
     ]);
 
     // Cari ID nasabah berdasarkan nama

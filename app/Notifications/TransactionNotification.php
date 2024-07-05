@@ -29,7 +29,10 @@ class TransactionNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'message' => ucfirst($this->type) . ' of ' . $this->amount . ' was successful.',
+            'id' => $notifiable->id,
+            'type' => $this->type,
+            'data' => ucfirst($this->type) . ' of ' . $this->amount . ' was successful.',
+
         ];
     }
 

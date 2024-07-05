@@ -49,39 +49,25 @@
                             <h6>Riwayat Transaksi</h6>
                         </div>
                         <div class="card-body px-0 pt-0 pb-2 w-100">
-                            @if(Auth::user()->level == 'admin')
-                            <div class="d-flex justify-content-between">
-                                <form action="{{ route('admin.laporan.filter') }}" method="GET" class="mb-3">
-                                    <div class="d-flex">
-                                        <div class="pe-1">
-                                            <input type="date" name="tanggal_mulai" class="form-control">
+                            @if (Auth::user()->level == 'admin')
+                                <div class="d-flex justify-content-between">
+                                    <form action="{{ route('admin.laporan.filter') }}" method="GET" class="mb-3">
+                                        <div class="d-flex">
+                                            <div class="pe-1">
+                                                <input type="date" name="tanggal_mulai" class="form-control">
+                                            </div>
+                                            <div class="pe-1">
+                                                <input type="date" name="tanggal_selesai" class="form-control">
+                                            </div>
+                                            <div class="pe-1">
+                                                <button type="submit" class="btn btn-primary">Filter</button>
+                                            </div>
                                         </div>
-                                        <div class="pe-1">
-                                            <input type="date" name="tanggal_selesai" class="form-control">
-                                        </div>
-                                        <div class="pe-1">
-                                            <button type="submit" class="btn btn-primary">Filter</button>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </form>
 
-                                <form action="{{ route('admin.laporan.search') }}">
-                                    <!-- Search Form -->
-                                    <div class="d-flex">
-                                        <div class="ps-1">
-                                            <input type="text" name="search" class="form-control"
-                                                placeholder="Search...">
-                                        </div>
-                                        <div class="ps-1">
-                                            <button type="submit" class="btn btn-primary">Search</button>
-                                        </div>
-                                    </div>
 
-                                </form>
-
-                            </div>
-                            <!-- Filter Form -->
-
+                                </div>
+                                <!-- Filter Form -->
                             @endif
                             <div class="table-responsive p-0">
 
@@ -119,44 +105,53 @@
                                             <th
                                                 class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                                 Rupiah</th>
-                                            @if(Auth::user()->level == 'admin')
-                                            <th
-                                                class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                                Actions</th>
+                                            @if (Auth::user()->level == 'admin')
+                                                <th
+                                                    class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                                    Actions</th>
                                             @endif
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($laporan as $data)
-                                        <tr>
-                                            <td class="align-middle text-center text-sm">{{ $data->id_laporan }}</td>
-                                            
-                                            <td class="align-middle text-center text-sm">{{ $data->nama_pegawai }}</td>
-                                            <td class="align-middle text-center text-sm">{{ $data->nama_nasabah }}</td>
-                                            <td class="align-middle text-center text-sm">{{ $data->jumlah_koin_100 }}
-                                            </td>
-                                            <td class="align-middle text-center text-sm">{{ $data->jumlah_koin_200 }}
-                                            </td>
-                                            <td class="align-middle text-center text-sm">{{ $data->jumlah_koin_500 }}
-                                            </td>
-                                            <td class="align-middle text-center text-sm">{{ $data->jumlah_koin_1000 }}
-                                            </td>
-                                            <td class="align-middle text-center text-sm">{{ $data->jumlah_rupiah }}</td>
-                                            @if(Auth::user()->level == 'admin')
-                                            <td class="align-middle text-center text-sm">
-                                                <a href="{{ route('admin.laporan.edit', ['id' => $user->id, 'id_laporan' => $data->id_laporan]) }}"
-                                                    class="btn btn-primary btn-sm">Edit</a>
-                                                <form
-                                                    action="{{ route('admin.laporan.destroy', ['id' => $user->id, 'id_laporan' => $data->id_laporan]) }}"
-                                                    method="POST" style="display: inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
-                                                </form>
-                                            </td>
-                                            @endif
-                                        </tr>
+                                        @foreach ($laporan as $data)
+                                            <tr>
+                                                <td class="align-middle text-center text-sm">{{ $loop->iteration }}</td>
+                                                <td class="align-middle text-center text-sm">{{ $data->tanggal }}</td>
+                                                <td class="align-middle text-center text-sm">{{ $data->jam }}</td>
+
+                                                <td class="align-middle text-center text-sm">{{ $data->nama_pegawai }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">{{ $data->nama_nasabah }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    {{ $data->jumlah_koin_100 }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    {{ $data->jumlah_koin_200 }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    {{ $data->jumlah_koin_500 }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">
+                                                    {{ $data->jumlah_koin_1000 }}
+                                                </td>
+                                                <td class="align-middle text-center text-sm">{{ $data->jumlah_rupiah }}
+                                                </td>
+                                                @if (Auth::user()->level == 'admin')
+                                                    <td class="align-middle text-center text-sm">
+                                                        <a href="{{ route('admin.laporan.edit', ['id' => $user->id, 'id_laporan' => $data->id_laporan]) }}"
+                                                            class="btn btn-primary btn-sm">Edit</a>
+                                                        <form
+                                                            action="{{ route('admin.laporan.destroy', ['id' => $user->id, 'id_laporan' => $data->id_laporan]) }}"
+                                                            method="POST" style="display: inline;">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-danger btn-sm"
+                                                                onclick="return confirm('Are you sure you want to delete this item?')">Delete</button>
+                                                        </form>
+                                                    </td>
+                                                @endif
+                                            </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -172,9 +167,9 @@
                     <div class="row align-items-center justify-content-lg-between">
                         <div class="col-lg-6 mb-lg-0 mb-4">
                             <div class="copyright text-center text-sm text-muted text-lg-start">
-                                © <script>
+                                ©
+                                <script>
                                     document.write(new Date().getFullYear())
-
                                 </script>,
                                 made with <i class="fa fa-heart"></i> by
                                 <a href="https://www.creative-tim.com" class="font-weight-bold" target="_blank">Creative
@@ -384,7 +379,6 @@
                 },
             },
         });
-
     </script>
     <script>
         var win = navigator.platform.indexOf('Win') > -1;
@@ -394,7 +388,6 @@
             }
             Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
         }
-
     </script>
     <!-- Github buttons -->
     <script async defer src="https://buttons.github.io/buttons.js"></script>

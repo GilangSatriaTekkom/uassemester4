@@ -34,83 +34,82 @@ class TransaksiOtomatisController extends Controller
     return view('nasabah.transfer_otomatis', compact('autoTransactions', 'formattedSaldo', 'id'));
 }
 
-    public function store(Request $request, $id)
-    {
-        // Validation rules
-        $request->validate([
-            'nama' => 'required|exists:users,name',
-            'nomor_rekening' => 'required|exists:tabel_rekening,nomor_rekening',
-            'jumlah_transfer' => 'required|numeric|min:1',
-            'interval' => 'required|in:mingguan,bulanan,rubah',
-            'tanggal' => 'required_if:interval,rubah|nullable|date_format:Y-m-d',
-            'waktu' => 'required_if:interval,rubah|nullable|date_format:H:i',
-        ]);
-    
-        // Find the sender's account
-        $rekening_pengirim = TabelRekening::where('id', Auth::user()->id)->first();
-    
-        // Check if the sender's account exists
-        if (!$rekening_pengirim) {
-            return redirect()->back()->withErrors(['error' => 'Rekening pengirim tidak ditemukan.']);
-        }
-    
-        // Check if the sender's balance is sufficient
-        if ($rekening_pengirim->jumlah_tabungan < $request->jumlah_transfer) {
-            return redirect()->back()->withErrors(['jumlah_transfer' => 'Jumlah tabungan tidak mencukupi.']);
-        }
-    
-        // Prevent the sender from transferring to their own account
-        if ($rekening_pengirim->nomor_rekening == $request->nomor_rekening) {
-            return redirect()->back()->withErrors(['nomor_rekening' => 'Nomor rekening penerima tidak boleh sama dengan nomor rekening pengirim.']);
-        }
+public function store(Request $request, $id)
+{
+    // Validation rules
+    $request->validate([
+        'nama' => 'required|exists:users,name',
+        'nomor_rekening' => 'required|exists:tabel_rekening,nomor_rekening',
+        'jumlah_transfer' => 'required|numeric|min:1',
+        'interval' => 'required|in:mingguan,bulanan,rubah',
+        'tanggal' => 'required_if:interval,rubah|nullable|date_format:Y-m-d',
+        'waktu' => 'required_if:interval,rubah|nullable|date_format:H:i',
+    ]);
 
-         // Mengambil data rekening berdasarkan nomor rekening
-        $rekening = TabelRekening::where('nomor_rekening', $request)->first();
+    // Find the sender's account
+    $rekening_pengirim = TabelRekening::where('id', Auth::id())->first();
 
-        // Mengambil user yang memiliki rekening (penerima)
-        $penerima = $request->nama;
+    // Check if the sender's account exists
+    if (!$rekening_pengirim) {
+        return redirect()->back()->withErrors(['error' => 'Rekening pengirim tidak ditemukan.']);
+    }
 
-        if (!$penerima) {
-            // Tambahkan logika untuk jika user tidak ditemukan
-            return redirect()->back()->withErrors(['nomor_rekening' => 'Penerima tidak ditemukan.']);
-        }
-    
-        // Create a new automatic transfer
-        $transfer = new TabelAutoTransaksi();
-        $transfer->id_user = Auth::id();
-        $transfer->nomor_rekening = $request->nomor_rekening;
-        $transfer->nama_penerima = $request->nama; 
-        $transfer->jumlah_transfer = $request->jumlah_transfer;
-        if ($request->interval === 'mingguan') {
-            // Interval mingguan
-            $transfer->interval = now()->addWeek()->format('Y-m-d H:i');
-        } elseif ($request->interval === 'bulanan') {
-            // Interval bulanan
-            $transfer->interval = now()->addMonth()->format('Y-m-d H:i');
-        } elseif ($request->interval === 'rubah') {
-            // Interval rubah
+    // Check if the sender's balance is sufficient
+    if ($rekening_pengirim->jumlah_tabungan < $request->jumlah_transfer) {
+        return redirect()->back()->withErrors(['jumlah_transfer' => 'Jumlah tabungan tidak mencukupi.']);
+    }
+
+    // Prevent the sender from transferring to their own account
+    if ($rekening_pengirim->nomor_rekening == $request->nomor_rekening) {
+        return redirect()->back()->withErrors(['nomor_rekening' => 'Nomor rekening penerima tidak boleh sama dengan nomor rekening pengirim.']);
+    }
+
+    // Find the recipient's account based on the provided name
+    $penerima = User::where('name', $request->nama)->first();
+
+    if (!$penerima) {
+        return redirect()->back()->withErrors(['nama' => 'Penerima tidak ditemukan.']);
+    }
+
+    // Create a new automatic transfer
+    $transfer = new TabelAutoTransaksi();
+    $transfer->id_user = Auth::id();
+    $transfer->nomor_rekening = $request->nomor_rekening;
+    $transfer->nama_penerima = $request->nama;
+    $transfer->jumlah_transfer = $request->jumlah_transfer;
+
+    // Set interval based on the selected option
+    switch ($request->interval) {
+        case 'mingguan':
+            $transfer->interval = now()->addWeek()->format('Y-m-d H:i:s');
+            $transfer->status = '1_minggu';
+            break;
+        case 'bulanan':
+            $transfer->interval = now()->addMonth()->format('Y-m-d H:i:s');
+            $transfer->status = '1_bulan';
+            break;
+        case 'rubah':
             $request->validate([
                 'tanggal' => 'required|date_format:Y-m-d',
                 'waktu' => 'required|date_format:H:i',
             ]);
-        
+
             $transfer->interval = $request->tanggal . ' ' . $request->waktu;
-        } else {
-            // Default jika interval tidak dikenali (opsional)
+            $transfer->status = 'Sesuai_tanggal';
+            break;
+        default:
+            // Default if interval is not recognized (optional)
             $transfer->interval = null;
-        }
-        $transfer->status = 'Aktif'; // Default status is active when added
-
-        // Calculate remaining time until the next transaction (this is a placeholder)
-        // $transfer->remaining_time = '...'; // Implement actual calculation here
-        $transfer->save();
-
-        // After saving the transfer
-        // $recipient = TabelRekening::where('nomor_rekening', $request->nomor_rekening)->first()->user;
-        // $recipient->notify(new TransferNotification($request->jumlah_transfer));
-    
-        return redirect()->route('transactions.auto', ['id' => $id])->with('success', 'Transfer otomatis berhasil ditambahkan.');
+            $transfer->status = null;
     }
+
+    // Save the automatic transfer
+    $transfer->save();
+
+    // Redirect with success message
+    return redirect()->route('transactions.auto', ['id' => $id])->with('success', 'Transfer otomatis berhasil ditambahkan.');
+}
+
 
     public function destroy($id)
     {
@@ -123,6 +122,6 @@ class TransaksiOtomatisController extends Controller
             return redirect()->route('transactions.auto', ['id' => $id])->withErrors(['error' => 'Transfer otomatis tidak ditemukan.']);
         }
     }
-    
+
 
 }
