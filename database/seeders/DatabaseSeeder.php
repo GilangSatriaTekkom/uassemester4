@@ -21,13 +21,20 @@ class DatabaseSeeder extends Seeder
         // ]);
 
         $this->call([
-            TabelPegawaiSeeder::class,
-            TabelNasabahSeeder::class,
-            TabelRekeningSeeder::class,
-            TabelLaporanSeeder::class,
-            TabelTransaksiSeeder::class,
-            TabelNotifikasiSeeder::class,
-            TabelAutoTransaksiSeeder::class,
+            CacheTableSeeder::class,
+            CacheLocksTableSeeder::class,
+            CounterTableSeeder::class,
+            FailedJobsTableSeeder::class,
+            JobsTableSeeder::class,
+            MigrationsTableSeeder::class,
+            NotificationsTableSeeder::class,
+            PasswordResetTokensTableSeeder::class,
+            SessionsTableSeeder::class,
+            TabelLaporanTableSeeder::class,
+            TabelRekeningTableSeeder::class,
+            TabelTransaksiTableSeeder::class,
+            TransaksiOtomatisTableSeeder::class,
+            UsersTableSeeder::class,
         ]);
     }
 }
